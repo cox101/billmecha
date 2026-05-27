@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bill Mecha — Network Operations & Software Engineer</title>
+<link rel="canonical" href="https://billmecha.github.io/portfolio/">
+<meta property="og:url" content="https://billmecha.github.io/portfolio/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bill Mecha — Network Operations & Software Engineer">
+<meta property="og:description" content="Interactive personal portfolio for Bill Mecha, featuring network operations, software engineering, and NOC-focused project work.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bill Mecha — Network Operations & Software Engineer">
+<meta name="twitter:description" content="Interactive personal portfolio for Bill Mecha, featuring network operations, software engineering, and NOC-focused project work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050816;--surface:#0F172A;--surface2:#111827;
+  --primary:#8B5CF6;--secondary:#06B6D4;--accent:#EC4899;
+  --success:#10B981;--danger:#EF4444;--warn:#F59E0B;
+  --text:#E2E8F0;--muted:#64748B;--dim:#334155;
+  --border:rgba(139,92,246,.15);--border-cyan:rgba(6,182,212,.15);
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Inter',sans-serif;
+  --display:'Space Grotesk',sans-serif;
+}
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--primary) var(--bg)}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--primary),var(--secondary));border-radius:4px}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden;line-height:1.6}
+
+.cursor-glow{position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.08) 0%,transparent 70%);pointer-events:none;z-index:1;transform:translate(-50%,-50%);transition:opacity .3s}
+
+#boot{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.9rem;padding:2rem}
+.boot-inner{max-width:600px;width:100%}
+.boot-line{margin-bottom:.5rem;opacity:0;color:var(--text)}
+.boot-line.show{opacity:1;animation:bootFade .3s ease-out forwards}
+.boot-line .ok{color:var(--success)}
+.boot-line .warn{color:var(--warn)}
+.boot-line .dim{color:var(--muted)}
+.boot-line .cy{color:var(--secondary)}
+.boot-bar{margin-top:1rem;height:2px;background:var(--surface);position:relative;overflow:hidden;border-radius:2px}
+.boot-bar::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,var(--primary),var(--secondary));width:0%;animation:bootBar 2.6s ease-out forwards}
+@keyframes bootFade{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:none}}
+@keyframes bootBar{to{width:100%}}
+#boot.done{animation:bootExit .8s ease-in-out forwards}
+@keyframes bootExit{to{opacity:0;visibility:hidden}}
+
+canvas#bg{position:fixed;inset:0;z-index:0;opacity:.5}
+.grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(139,92,246,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none}
+
+.scroll-progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));width:0%;z-index:200;transition:width .1s}
+
+nav{position:fixed;top:1rem;left:50%;transform:translateX(-50%);z-index:100;backdrop-filter:blur(20px);background:rgba(5,8,22,.7);border:1px solid var(--border);border-radius:100px;padding:.5rem 1rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;max-width:calc(100% - 2rem)}
+.nav-logo{font-family:var(--mono);font-size:.85rem;font-weight:600;color:var(--secondary);padding:0 .75rem;border-right:1px solid var(--border)}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:.25rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;padding:.4rem .8rem;border-radius:100px;transition:.2s}
+.nav-links a:hover{color:var(--text);background:rgba(139,92,246,.1)}
+.term-btn{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none;padding:.4rem .9rem;border-radius:100px;font-family:var(--mono);font-size:.75rem;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:.3rem;transition:.2s}
+.term-btn:hover{transform:scale(1.04);box-shadow:0 0 20px rgba(139,92,246,.4)}
+
+section{position:relative;z-index:2;padding:7rem 1.5rem 4rem}
+.container{max-width:1180px;margin:0 auto}
+.s-label{font-family:var(--mono);font-size:.75rem;color:var(--secondary);letter-spacing:3px;text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.s-label::before{content:'';width:24px;height:1px;background:var(--secondary)}
+.s-title{font-family:var(--display);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:600;margin-bottom:.75rem;letter-spacing:-.02em}
+.s-title .grad{background:linear-gradient(135deg,var(--primary),var(--secondary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:gradShift 6s ease infinite}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.s-sub{color:var(--muted);max-width:600px;margin-bottom:3rem}
+
+#hero{min-height:100vh;display:flex;align-items:center;padding-top:8rem}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem .9rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:100px;font-family:var(--mono);font-size:.75rem;color:var(--success);margin-bottom:1.5rem}
+.hero-tag .pulse{width:6px;height:6px;background:var(--success);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.6)}50%{box-shadow:0 0 0 6px rgba(16,185,129,0)}}
+.hero-name{font-family:var(--display);font-size:clamp(2.4rem,7vw,4.5rem);font-weight:700;letter-spacing:-.03em;line-height:1.05;margin-bottom:.5rem;background:linear-gradient(180deg,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-role{font-family:var(--display);font-size:clamp(1.2rem,3vw,1.8rem);font-weight:500;color:var(--secondary);margin-bottom:1rem;line-height:1.3}
+.hero-role .acc{color:var(--accent)}
+.hero-typed{font-family:var(--mono);font-size:1rem;color:var(--muted);margin-bottom:1.5rem;min-height:1.5em;word-break:break-all}
+.hero-typed .prompt{color:var(--success)}
+.cursor-blink{display:inline-block;width:8px;height:1em;background:var(--secondary);animation:blink .7s infinite;vertical-align:-2px;margin-left:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.hero-desc{font-size:1.05rem;color:#94A3B8;max-width:600px;margin-bottom:2rem;line-height:1.8}
+.hero-desc b{color:var(--text);font-weight:500}
+.hero-btns{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:3rem}
+.btn{padding:.8rem 1.6rem;border-radius:.6rem;font-size:.9rem;font-weight:500;cursor:pointer;transition:.25s;display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;border:none;font-family:var(--sans)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;box-shadow:0 0 0 0 rgba(139,92,246,.5)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(139,92,246,.6)}
+.btn-ghost{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:var(--secondary);background:rgba(6,182,212,.05)}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;padding-top:2rem;border-top:1px solid var(--border);max-width:600px}
+.stat-num{font-family:var(--display);font-size:1.8rem;font-weight:600;background:linear-gradient(135deg,var(--secondary),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:.25rem}
+
+.about-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:3rem;align-items:start}
+.about-panel{background:linear-gradient(180deg,var(--surface),rgba(15,23,42,.5));border:1px solid var(--border);border-radius:1rem;padding:1.5rem;position:relative;overflow:hidden}
+.about-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--primary),transparent)}
+.avatar{width:100%;aspect-ratio:1;border-radius:.75rem;background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(6,182,212,.05));display:flex;align-items:center;justify-content:center;font-size:5rem;border:1px solid var(--border);margin-bottom:1rem;position:relative;overflow:hidden}
+.avatar::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(139,92,246,.04) 8px,rgba(139,92,246,.04) 9px)}
+.info-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.78rem;padding:.6rem 0;border-bottom:1px dashed var(--border)}
+.info-row:last-child{border-bottom:none}
+.info-row .k{color:var(--muted)}
+.info-row .v{color:var(--text);text-align:right}
+.info-row .v .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--success);margin-right:5px;animation:pulse 2s infinite}
+.about-text h3{font-family:var(--display);font-size:1.4rem;margin-bottom:1rem;color:#fff;line-height:1.3}
+.about-text p{color:#94A3B8;margin-bottom:1.1rem;line-height:1.85}
+.about-text b{color:var(--secondary);font-weight:500}
+.about-text .pp{color:var(--primary)}
+.about-text .ac{color:var(--accent)}
+.strengths{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin-top:1.25rem}
+.strength{font-family:var(--mono);font-size:.72rem;color:var(--muted);padding:.4rem .6rem;background:rgba(139,92,246,.04);border:1px solid var(--border);border-radius:.4rem;display:flex;align-items:center;gap:.4rem}
+.strength::before{content:'▸';color:var(--secondary)}
+
+#skills .skill-wrap{background:linear-gradient(180deg,var(--surface),rgba(15,23,42,.3));border:1px solid var(--border);border-radius:1rem;padding:1.5rem;position:relative;overflow:hidden}
+.skill-svg{width:100%;height:450px;display:block}
+.skill-tip{position:absolute;background:var(--surface2);border:1px solid var(--primary);border-radius:.5rem;padding:.75rem 1rem;font-size:.8rem;pointer-events:none;opacity:0;transition:.15s;z-index:10;min-width:180px;box-shadow:0 10px 40px -10px rgba(0,0,0,.5)}
+.skill-tip .tt{color:var(--secondary);font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:.4rem}
+.skill-tip .tn{font-weight:600;color:#fff;margin-bottom:.3rem}
+.skill-tip .td{color:var(--muted);font-size:.75rem}
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin-top:1.5rem}
+.skill-cat{padding:1rem;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:.6rem;transition:.25s}
+.skill-cat:hover{border-color:var(--secondary);background:rgba(6,182,212,.03);transform:translateY(-2px)}
+.skill-cat .ico{font-size:1.4rem;margin-bottom:.5rem}
+.skill-cat .ct{font-family:var(--mono);font-size:.7rem;color:var(--secondary);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem}
+.skill-cat .cl{display:flex;flex-wrap:wrap;gap:.3rem}
+.skill-cat .cl span{font-size:.7rem;font-family:var(--mono);color:var(--muted);background:rgba(139,92,246,.05);padding:.15rem .4rem;border-radius:.3rem}
+
+.dash{display:grid;grid-template-columns:repeat(12,1fr);gap:1rem}
+.dash-card{background:linear-gradient(180deg,var(--surface),rgba(15,23,42,.5));border:1px solid var(--border);border-radius:.85rem;padding:1.1rem;position:relative;overflow:hidden}
+.dash-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--c,var(--secondary)),transparent);opacity:.5}
+.dash-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.dash-h .lbl{font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.dash-h .live{font-family:var(--mono);font-size:.6rem;color:var(--success);display:flex;align-items:center;gap:.3rem}
+.dash-h .live::before{content:'';width:6px;height:6px;background:var(--success);border-radius:50%;animation:pulse 1.5s infinite}
+.dash-v{font-family:var(--display);font-size:1.8rem;font-weight:600;color:#fff;line-height:1}
+.dash-v .u{font-size:.9rem;color:var(--muted);font-weight:400;margin-left:.25rem}
+.dash-d{font-family:var(--mono);font-size:.7rem;color:var(--success);margin-top:.3rem;display:flex;align-items:center;gap:.3rem}
+.dash-d.bad{color:var(--danger)}
+.c-1{grid-column:span 3}.c-2{grid-column:span 3}.c-3{grid-column:span 3}.c-4{grid-column:span 3}
+.c-graph{grid-column:span 8;min-height:220px}
+.c-globe{grid-column:span 4;min-height:220px}
+.c-log{grid-column:span 12;min-height:180px}
+#trafficChart{width:100%;height:160px;display:block}
+.globe-wrap{position:relative;height:170px;display:flex;align-items:center;justify-content:center}
+.globe-svg{width:170px;height:170px}
+.log-list{max-height:140px;overflow-y:auto;font-family:var(--mono);font-size:.72rem;line-height:1.7}
+.log-list::-webkit-scrollbar{width:4px}
+.log-list .log-line{padding:.15rem 0;border-bottom:1px solid rgba(139,92,246,.05);display:grid;grid-template-columns:90px 70px 1fr;gap:.75rem;align-items:center}
+.log-line .t{color:var(--muted)}
+.log-line .lvl{font-weight:500;text-transform:uppercase;font-size:.65rem;letter-spacing:1px}
+.log-line .lvl.info{color:var(--secondary)}
+.log-line .lvl.warn{color:var(--warn)}
+.log-line .lvl.crit{color:var(--danger)}
+.log-line .lvl.ok{color:var(--success)}
+.log-line .msg{color:var(--text)}
+
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem}
+.proj{background:linear-gradient(180deg,var(--surface),rgba(15,23,42,.6));border:1px solid var(--border);border-radius:1rem;padding:1.4rem;transition:.3s;position:relative;overflow:hidden;transform-style:preserve-3d;cursor:pointer}
+.proj::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--x,50%) var(--y,50%),rgba(139,92,246,.12),transparent 50%);opacity:0;transition:.3s;pointer-events:none}
+.proj:hover::before{opacity:1}
+.proj:hover{border-color:rgba(139,92,246,.4)}
+.proj-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem}
+.proj-ico{width:42px;height:42px;border-radius:.5rem;background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(6,182,212,.05));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.proj-status{font-family:var(--mono);font-size:.65rem;color:var(--success);background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);padding:.2rem .5rem;border-radius:.3rem;letter-spacing:.5px}
+.proj-status.lab{color:var(--secondary);background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.2)}
+.proj-status.wip{color:var(--warn);background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)}
+.proj-name{font-family:var(--display);font-size:1.05rem;font-weight:600;color:#fff;margin-bottom:.4rem}
+.proj-desc{font-size:.85rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;min-height:60px}
+.proj-stack{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1rem}
+.proj-stack span{font-family:var(--mono);font-size:.65rem;color:var(--secondary);background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.15);padding:.2rem .5rem;border-radius:.3rem}
+.proj-links{display:flex;gap:.5rem;padding-top:.75rem;border-top:1px solid var(--border)}
+.proj-links a{font-family:var(--mono);font-size:.75rem;color:var(--muted);text-decoration:none;transition:.2s;display:flex;align-items:center;gap:.25rem}
+.proj-links a:hover{color:var(--secondary)}
+
+.tl{position:relative;padding-left:2rem;max-width:850px;margin:0 auto}
+.tl::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,var(--primary),var(--secondary),var(--accent),transparent)}
+.tl-item{position:relative;margin-bottom:2.5rem}
+.tl-dot{position:absolute;left:-2rem;top:.5rem;width:13px;height:13px;border-radius:50%;background:var(--bg);border:2px solid var(--primary);box-shadow:0 0 0 4px rgba(139,92,246,.1),0 0 15px var(--primary)}
+.tl-item:nth-child(2) .tl-dot{border-color:var(--secondary);box-shadow:0 0 0 4px rgba(6,182,212,.1),0 0 15px var(--secondary)}
+.tl-item:nth-child(3) .tl-dot{border-color:var(--accent);box-shadow:0 0 0 4px rgba(236,72,153,.1),0 0 15px var(--accent)}
+.tl-item:nth-child(4) .tl-dot{border-color:var(--success);box-shadow:0 0 0 4px rgba(16,185,129,.1),0 0 15px var(--success)}
+.tl-card{background:linear-gradient(180deg,var(--surface),rgba(15,23,42,.5));border:1px solid var(--border);border-radius:.85rem;padding:1.2rem 1.4rem;transition:.25s}
+.tl-card:hover{border-color:rgba(139,92,246,.35);transform:translateX(4px)}
+.tl-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem}
+.tl-role{font-family:var(--display);font-size:1.05rem;font-weight:600;color:#fff}
+.tl-period{font-family:var(--mono);font-size:.7rem;color:var(--secondary);background:rgba(6,182,212,.08);padding:.2rem .6rem;border-radius:.3rem;border:1px solid rgba(6,182,212,.15)}
+.tl-co{color:var(--primary);font-size:.85rem;margin-bottom:.75rem;font-weight:500}
+.tl-bul{list-style:none}
+.tl-bul li{font-size:.85rem;color:var(--muted);padding-left:1.1rem;position:relative;margin-bottom:.35rem;line-height:1.65}
+.tl-bul li::before{content:'▸';position:absolute;left:0;color:var(--secondary);font-size:.7rem;top:.25rem}
+.tl-tech{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.75rem;padding-top:.75rem;border-top:1px dashed var(--border)}
+.tl-tech span{font-family:var(--mono);font-size:.65rem;color:var(--muted);padding:.15rem .45rem;background:rgba(139,92,246,.05);border-radius:.3rem}
+
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.cert{background:linear-gradient(135deg,var(--surface),rgba(15,23,42,.5));border:1px solid var(--border);border-radius:.85rem;padding:1.2rem;text-align:center;transition:.3s;position:relative;overflow:hidden}
+.cert::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from var(--ang,0deg),transparent,var(--c,var(--primary)),transparent 30%);opacity:0;transition:.4s;animation:rot 6s linear infinite paused}
+.cert:hover::after{opacity:.15;animation-play-state:running}
+.cert>*{position:relative;z-index:1}
+@keyframes rot{to{--ang:360deg}}
+.cert-ico{width:60px;height:60px;border-radius:50%;background:rgba(139,92,246,.08);border:1px solid var(--border);margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;font-size:1.6rem;transition:.3s}
+.cert:hover .cert-ico{background:rgba(139,92,246,.15);transform:scale(1.05)}
+.cert-name{font-family:var(--display);font-weight:600;color:#fff;margin-bottom:.25rem}
+.cert-issuer{font-size:.75rem;color:var(--muted);margin-bottom:.5rem}
+.cert-tag{display:inline-block;font-family:var(--mono);font-size:.65rem;color:var(--success);background:rgba(16,185,129,.08);padding:.15rem .5rem;border-radius:.3rem;letter-spacing:.5px}
+.cert-tag.wip{color:var(--warn);background:rgba(245,158,11,.08)}
+
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem}
+.contact-info h3{font-family:var(--display);font-size:1.4rem;margin-bottom:1rem;color:#fff}
+.contact-info p{color:var(--muted);line-height:1.8;margin-bottom:1.5rem}
+.contact-links{display:flex;flex-direction:column;gap:.5rem}
+.c-link{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:.6rem;color:var(--text);text-decoration:none;font-size:.85rem;transition:.25s}
+.c-link:hover{border-color:var(--secondary);background:rgba(6,182,212,.05);transform:translateX(4px)}
+.c-link .ico{width:32px;height:32px;border-radius:.4rem;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;color:var(--primary)}
+.c-link .lbl{color:var(--muted);font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:1px}
+.c-link .val{display:block;color:var(--text);font-size:.9rem;margin-top:2px;word-break:break-all}
+.form{background:linear-gradient(180deg,var(--surface),rgba(15,23,42,.5));border:1px solid var(--border);border-radius:.85rem;padding:1.5rem}
+.fg{margin-bottom:1rem}
+.fg label{display:block;font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.4rem}
+.fg input,.fg textarea{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:.5rem;padding:.7rem .9rem;color:var(--text);font-family:var(--sans);font-size:.9rem;transition:.2s;outline:none}
+.fg input:focus,.fg textarea:focus{border-color:var(--secondary);background:rgba(6,182,212,.03)}
+.fg textarea{height:110px;resize:vertical}
+.send-btn{width:100%;padding:.85rem;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none;border-radius:.5rem;font-family:var(--sans);font-size:.9rem;font-weight:500;cursor:pointer;transition:.25s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.send-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(139,92,246,.5)}
+
+#terminal{position:fixed;bottom:0;left:0;right:0;height:0;background:rgba(5,8,22,.97);backdrop-filter:blur(20px);border-top:1px solid var(--primary);z-index:500;transition:height .35s cubic-bezier(.4,0,.2,1);overflow:hidden;font-family:var(--mono)}
+#terminal.open{height:50vh}
+.term-bar{display:flex;align-items:center;gap:.75rem;padding:.6rem 1rem;border-bottom:1px solid var(--border);background:rgba(0,0,0,.3)}
+.term-dots{display:flex;gap:.4rem}
+.term-dots span{width:11px;height:11px;border-radius:50%}
+.term-dots span:nth-child(1){background:var(--danger)}
+.term-dots span:nth-child(2){background:var(--warn)}
+.term-dots span:nth-child(3){background:var(--success)}
+.term-title{font-size:.75rem;color:var(--muted);flex:1;text-align:center}
+.term-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:0 .3rem}
+.term-body{padding:1rem;height:calc(100% - 42px);overflow-y:auto;font-size:.8rem;line-height:1.6}
+.term-body::-webkit-scrollbar{width:4px}
+.term-line{margin-bottom:.2rem;color:var(--text);white-space:pre-wrap;word-break:break-word}
+.term-line.cmd{color:var(--text)}
+.term-line.cmd::before{content:'~ ';color:var(--secondary)}
+.term-line.cmd::after{content:' $';color:var(--success)}
+.term-line.out{color:var(--muted);padding-left:1rem}
+.term-line.ok{color:var(--success);padding-left:1rem}
+.term-line.err{color:var(--danger);padding-left:1rem}
+.term-line.acc{color:var(--accent);padding-left:1rem}
+.term-line.cy{color:var(--secondary);padding-left:1rem}
+.term-input-row{display:flex;align-items:center;gap:.5rem;padding-top:.3rem}
+.term-prompt{color:var(--success);font-weight:500}
+#termIn{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:.8rem;padding:0}
+
+footer{padding:2rem 1.5rem;text-align:center;color:var(--muted);font-size:.8rem;border-top:1px solid var(--border);position:relative;z-index:2;font-family:var(--mono)}
+footer .heart{color:var(--accent)}
+footer span{color:var(--secondary)}
+
+.reveal{opacity:0;transform:translateY(30px);transition:.7s cubic-bezier(.4,0,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:900px){
+  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .c-graph,.c-globe{grid-column:span 12}
+  .c-1,.c-2,.c-3,.c-4{grid-column:span 6}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .nav-links{display:none}
+  nav{padding:.4rem .5rem}
+  section{padding:5rem 1rem 3rem}
+}
+@media(max-width:500px){
+  .c-1,.c-2,.c-3,.c-4{grid-column:span 6}
+  .hero-name{font-size:2.2rem}
+  .strengths{grid-template-columns:1fr}
+}
+
+/* EDIT MODE */
+body.editing [contenteditable="true"]{outline:1px dashed rgba(236,72,153,.45);outline-offset:3px;border-radius:.25rem;cursor:text;transition:outline-color .15s,background .15s;min-height:1em}
+body.editing [contenteditable="true"]:hover{outline-color:var(--success);background:rgba(16,185,129,.05)}
+body.editing [contenteditable="true"]:focus{outline:2px solid var(--success);outline-offset:3px;background:rgba(16,185,129,.06);box-shadow:0 0 20px -5px rgba(16,185,129,.35)}
+body.editing a{cursor:text}
+.edit-banner{position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,var(--accent),var(--warn));color:#fff;padding:.6rem 1rem;text-align:center;font-family:var(--mono);font-size:.75rem;font-weight:600;z-index:1500;letter-spacing:.5px;display:none;align-items:center;justify-content:center;gap:.75rem;flex-wrap:wrap;box-shadow:0 4px 20px -4px rgba(236,72,153,.4)}
+.edit-banner.show{display:flex}
+.edit-banner .hint{opacity:.85;font-weight:400}
+.edit-banner button{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.35);color:#fff;padding:.3rem .9rem;border-radius:.3rem;cursor:pointer;font-family:var(--mono);font-size:.72rem;font-weight:500;transition:.2s}
+.edit-banner button:hover{background:rgba(0,0,0,.65);transform:scale(1.04)}
+body.editing nav{top:3.4rem}
+</style>
+</head>
+<body>
+
+<div id="boot">
+  <div class="boot-inner">
+    <div class="boot-line"><span class="dim">[</span><span class="cy">SYS</span><span class="dim">]</span> Initializing secure environment...</div>
+    <div class="boot-line"><span class="dim">[</span><span class="ok">OK</span><span class="dim">]</span> Loading network modules <span class="dim">....................</span> <span class="ok">done</span></div>
+    <div class="boot-line"><span class="dim">[</span><span class="ok">OK</span><span class="dim">]</span> Verifying TLS certificates <span class="dim">..................</span> <span class="ok">done</span></div>
+    <div class="boot-line"><span class="dim">[</span><span class="ok">OK</span><span class="dim">]</span> Establishing encrypted tunnel <span class="dim">...............</span> <span class="ok">done</span></div>
+    <div class="boot-line"><span class="dim">[</span><span class="warn">!!</span><span class="dim">]</span> Firewall policy check <span class="dim">....................</span> <span class="warn">2 warnings</span></div>
+    <div class="boot-line"><span class="dim">[</span><span class="ok">OK</span><span class="dim">]</span> Connecting to portfolio.sys <span class="dim">................</span> <span class="ok">done</span></div>
+    <div class="boot-line"><span class="dim">&gt;</span> <span class="cy">Access granted. Welcome, visitor.</span></div>
+    <div class="boot-bar"></div>
+  </div>
+</div>
+
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="grid-bg"></div>
+<canvas id="bg"></canvas>
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav>
+  <div class="nav-logo">&lt;<span>/</span>NOC&gt;</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#dashboard">Live</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Career</a></li>
+    <li><a href="#certs">Certs</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="term-btn" id="editBtn" type="button" onclick="toggleTerm()">▣ Terminal</button>
+
+</nav>
+
+<section id="hero">
+  <div class="container">
+    <div class="hero-tag"><span class="pulse"></span> 24/7 NOC engineer · Open to opportunities</div>
+    <h1 class="hero-name">Bill Mecha</h1>
+    <div class="hero-role">Technical Support Engineer <span class="acc">×</span> Software Engineer</div>
+    <div class="hero-typed"><span class="prompt">~ $</span> <span id="typed"></span><span class="cursor-blink"></span></div>
+    <p class="hero-desc">Network Operations engineer with <b>2+ years</b> supporting ISP and enterprise environments — specialized in <b>LAN/WAN, VPN, FTTH, and SLA-driven incident response</b>. ALX-certified software engineer, CCNA and Security+ in progress. I keep networks alive, customers connected, and tickets closed.</p>
+    <div class="hero-btns">
+      <a href="#projects" class="btn btn-primary">→ Explore Projects</a>
+      <a href="#contact" class="btn btn-ghost">⌘ Get in touch</a>
+      
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">2+</div><div class="stat-label">Years</div></div>
+      <div><div class="stat-num">3</div><div class="stat-label">Roles</div></div>
+      <div><div class="stat-num">ALX</div><div class="stat-label">Certified</div></div>
+      <div><div class="stat-num">24/7</div><div class="stat-label">NOC ready</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="container reveal">
+    <div class="s-label">01 · Profile</div>
+    <h2 class="s-title">About the <span class="grad">engineer</span></h2>
+    <div class="about-grid">
+      <div class="about-panel">
+        <div class="avatar">👤</div>
+        <div class="info-row"><span class="k">status</span><span class="v"><span class="dot"></span>online</span></div>
+        <div class="info-row"><span class="k">location</span><span class="v">Nairobi, KE</span></div>
+        <div class="info-row"><span class="k">role</span><span class="v">NOC · Support · Dev</span></div>
+        <div class="info-row"><span class="k">current</span><span class="v">Vilcom Networks</span></div>
+        <div class="info-row"><span class="k">education</span><span class="v">Diploma IT · KCA</span></div>
+        <div class="info-row"><span class="k">availability</span><span class="v">Open to roles</span></div>
+        <div class="info-row"><span class="k">shift</span><span class="v">24/7 capable</span></div>
+        <div class="info-row"><span class="k">timezone</span><span class="v">EAT (UTC+3)</span></div>
+        <div class="strengths">
+          <div class="strength">RCA & analysis</div>
+          <div class="strength">Incident mgmt</div>
+          <div class="strength">SLA discipline</div>
+          <div class="strength">Documentation</div>
+          <div class="strength">Customer focus</div>
+          <div class="strength">Team comms</div>
+        </div>
+      </div>
+      <div class="about-text">
+        <h3>Proactive engineer keeping ISP and enterprise networks online — across LAN, WAN, VPN, FTTH and beyond.</h3>
+        <p>I'm a <b>Technical Support Engineer</b> currently at <span class="pp">Vilcom Networks</span>, with over two years of hands-on experience in <b>NOC operations</b>, <span class="pp">incident response</span>, and <span class="pp">customer-impacting troubleshooting</span> across ISP and enterprise environments. I work shifts on a 24/7 rotation, respond to escalations, and own service availability for real customers.</p>
+        <p>My day-to-day spans <b>LAN/WAN, VPN, wireless, FTTH and routing</b> — diagnosing issues, restoring service within SLA, performing <span class="ac">root cause analysis</span>, and feeding lessons back into documentation. I have a strong working understanding of <b>TCP/IP, routing &amp; switching, DNS, DHCP</b>, and network security fundamentals, plus tools like <span class="pp">Wireshark</span> and <span class="pp">SolarWinds</span>.</p>
+        <p>On the software side, I'm <b>ALX-certified</b> in Software Engineering — I write Python and JavaScript, build internal tooling, and treat automation as the natural next step beyond manual troubleshooting. I'm actively pursuing <b>CCNA</b> and <span class="ac">CompTIA Security+</span> to deepen my edge in secure network operations.</p>
+        <p style="color:var(--secondary);font-style:italic">"Secure by default. Automated by design. Documented by discipline."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="container reveal">
+    <div class="s-label">02 · Capabilities</div>
+    <h2 class="s-title">Skill <span class="grad">network</span></h2>
+    <p class="s-sub">Hover any node to inspect the technology stack. NOC operations sit at the center — security, networking, and software all feed into it.</p>
+    <div class="skill-wrap">
+      <svg class="skill-svg" viewBox="0 0 800 450" id="skillSvg"></svg>
+      <div class="skill-tip" id="skillTip"></div>
+      <div class="skill-grid">
+        <div class="skill-cat"><div class="ico">📡</div><div class="ct">NOC & ISP Ops</div><div class="cl"><span>24/7 monitoring</span><span>SLA mgmt</span><span>Incident response</span><span>RCA</span><span>Ticketing</span></div></div>
+        <div class="skill-cat"><div class="ico">🌐</div><div class="ct">Networking</div><div class="cl"><span>TCP/IP</span><span>Routing</span><span>Switching</span><span>VLANs</span><span>DNS/DHCP</span><span>Wireless</span></div></div>
+        <div class="skill-cat"><div class="ico">🔗</div><div class="ct">ISP Infrastructure</div><div class="cl"><span>FTTH</span><span>GPON</span><span>OLT</span><span>Fiber Optic</span><span>CPE</span></div></div>
+        <div class="skill-cat"><div class="ico">🛡️</div><div class="ct">Security Fundamentals</div><div class="cl"><span>Firewalls</span><span>VPN</span><span>NAC</span><span>Wireshark</span><span>Net hardening</span></div></div>
+        <div class="skill-cat"><div class="ico">💻</div><div class="ct">Software Eng (ALX)</div><div class="cl"><span>Python</span><span>JavaScript</span><span>HTML/CSS</span><span>Linux</span><span>Git</span></div></div>
+        <div class="skill-cat"><div class="ico">🧰</div><div class="ct">Support & Tools</div><div class="cl"><span>CRM</span><span>SolarWinds</span><span>AD basics</span><span>VoIP</span><span>Remote support</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="dashboard">
+  <div class="container reveal">
+    <div class="s-label">03 · Control center</div>
+    <h2 class="s-title">Live <span class="grad">NOC view</span></h2>
+    <p class="s-sub">A simulated NOC dashboard — the kind of view I monitor on shift. Every metric updates in real time.</p>
+    <div class="dash">
+      <div class="dash-card c-1" style="--c:var(--success)"><div class="dash-h"><span class="lbl">Uptime</span><span class="live">live</span></div><div class="dash-v" id="uptime">99.97<span class="u">%</span></div><div class="dash-d">▲ 0.02% vs last 24h</div></div>
+      <div class="dash-card c-2" style="--c:var(--secondary)"><div class="dash-h"><span class="lbl">Active VPN</span><span class="live">live</span></div><div class="dash-v" id="vpn">847</div><div class="dash-d">▲ 12 new sessions</div></div>
+      <div class="dash-card c-3" style="--c:var(--warn)"><div class="dash-h"><span class="lbl">Open tickets</span><span class="live">live</span></div><div class="dash-v" id="threats">14</div><div class="dash-d">▼ 3 resolved this hour</div></div>
+      <div class="dash-card c-4" style="--c:var(--accent)"><div class="dash-h"><span class="lbl">Avg latency</span><span class="live">live</span></div><div class="dash-v" id="latency">14<span class="u">ms</span></div><div class="dash-d">▼ 2ms · stable</div></div>
+      <div class="dash-card c-graph"><div class="dash-h"><span class="lbl">FTTH throughput · last 60s</span><span class="live">streaming</span></div><canvas id="trafficChart"></canvas></div>
+      <div class="dash-card c-globe"><div class="dash-h"><span class="lbl">Active sites</span><span class="live">14 online</span></div><div class="globe-wrap"><svg class="globe-svg" viewBox="0 0 200 200" id="globeSvg"></svg></div></div>
+      <div class="dash-card c-log"><div class="dash-h"><span class="lbl">Incident event log</span><span class="live">streaming</span></div><div class="log-list" id="logList"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="container reveal">
+    <div class="s-label">04 · Selected work</div>
+    <h2 class="s-title">Featured <span class="grad">projects</span></h2>
+    <p class="s-sub">Personal builds, labs, and work-related tooling — bridging network operations with software engineering.</p>
+    <div class="proj-grid">
+      <div class="proj tilt">
+        <div class="proj-head"><div class="proj-ico">📊</div><div class="proj-status lab">PERSONAL</div></div>
+        <div class="proj-name">NOC Health Dashboard</div>
+        <div class="proj-desc">Web dashboard that polls network device health via SNMP, visualizes uptime/latency/throughput, and surfaces SLA-impacting incidents in real time.</div>
+        <div class="proj-stack"><span>Python</span><span>SNMP</span><span>Flask</span><span>Chart.js</span></div>
+        <div class="proj-links"><a href="#">↗ Source</a><a href="#">⌘ Demo</a></div>
+      </div>
+      <div class="proj tilt">
+        <div class="proj-head"><div class="proj-ico">🔗</div><div class="proj-status lab">LAB</div></div>
+        <div class="proj-name">FTTH Troubleshooting Toolkit</div>
+        <div class="proj-desc">CLI tool for common FTTH/GPON diagnostics — ONT signal levels, optical power checks, link quality assessment, and outage runbooks for L1/L2 support.</div>
+        <div class="proj-stack"><span>Python</span><span>GPON</span><span>OLT</span><span>Bash</span></div>
+        <div class="proj-links"><a href="#">↗ Source</a></div>
+      </div>
+      <div class="proj tilt">
+        <div class="proj-head"><div class="proj-ico">🎫</div><div class="proj-status">DEPLOYED</div></div>
+        <div class="proj-name">Ticket Analytics Dashboard</div>
+        <div class="proj-desc">Internal dashboard analyzing ticket volume, resolution time, recurring fault patterns, and SLA compliance — turning support data into actionable insights.</div>
+        <div class="proj-stack"><span>JavaScript</span><span>Node.js</span><span>PostgreSQL</span><span>Recharts</span></div>
+        <div class="proj-links"><a href="#">↗ Source</a><a href="#">⌘ Demo</a></div>
+      </div>
+      <div class="proj tilt">
+        <div class="proj-head"><div class="proj-ico">🕵️</div><div class="proj-status wip">IN PROGRESS</div></div>
+        <div class="proj-name">PCAP Filter Library</div>
+        <div class="proj-desc">Curated library of Wireshark filters and analysis recipes for common incident response scenarios — VPN diagnostics, DHCP issues, suspicious traffic patterns.</div>
+        <div class="proj-stack"><span>Wireshark</span><span>tshark</span><span>Python</span><span>Markdown</span></div>
+        <div class="proj-links"><a href="#">↗ Source</a></div>
+      </div>
+      <div class="proj tilt">
+        <div class="proj-head"><div class="proj-ico">🖥️</div><div class="proj-status lab">LAB</div></div>
+        <div class="proj-name">Home Network Lab</div>
+        <div class="proj-desc">Virtualized lab running pfSense firewall, VLAN segmentation, Pi-hole DNS filtering, and a small monitoring stack — used to practice CCNA and Security+ topics.</div>
+        <div class="proj-stack"><span>pfSense</span><span>VLAN</span><span>Pi-hole</span><span>Proxmox</span></div>
+        <div class="proj-links"><a href="#">⌘ Notes</a></div>
+      </div>
+      <div class="proj tilt">
+        <div class="proj-head"><div class="proj-ico">🤖</div><div class="proj-status">DEPLOYED</div></div>
+        <div class="proj-name">Config Backup Automation</div>
+        <div class="proj-desc">Script suite that backs up router and switch configurations on a schedule, version-controls them in Git, and alerts on unauthorized changes.</div>
+        <div class="proj-stack"><span>Python</span><span>Netmiko</span><span>Git</span><span>Cron</span></div>
+        <div class="proj-links"><a href="#">↗ Source</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="container reveal">
+    <div class="s-label">05 · Trajectory</div>
+    <h2 class="s-title">Career <span class="grad">timeline</span></h2>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-head"><div class="tl-role">Technical Support Engineer</div><div class="tl-period">Jun 2025 — Present</div></div>
+          <div class="tl-co">Vilcom Networks Limited · Nairobi, KE</div>
+          <ul class="tl-bul">
+            <li>Provide L1 and L2 support for ISP and enterprise network infrastructure across multiple customer environments</li>
+            <li>Monitor network, server and customer connectivity health to ensure high availability and rapid incident response</li>
+            <li>Troubleshoot LAN/WAN, VPN, wireless, FTTH and routing issues, restoring service within SLA targets</li>
+            <li>Coordinate escalation with field engineers, SOC teams and external service providers</li>
+            <li>Perform root cause analysis (RCA) for recurring outages and customer-impacting incidents</li>
+            <li>Generate daily, weekly and monthly operational reports on incident trends, outages, SLA compliance and CSAT</li>
+            <li>Support compliance with patch management cycles, configuration standards and operational procedures</li>
+          </ul>
+          <div class="tl-tech"><span>TCP/IP</span><span>VPN</span><span>FTTH</span><span>GPON</span><span>OLT</span><span>Routing</span><span>Wireless</span><span>CRM</span><span>SLA</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-head"><div class="tl-role">Technical Support Representative</div><div class="tl-period">Aug 2024 — Jul 2025</div></div>
+          <div class="tl-co">Vijiji Connect Ltd · Nairobi, KE</div>
+          <ul class="tl-bul">
+            <li>Configured and supported FTTH routers, wireless access devices and internet connectivity for residential and SME clients</li>
+            <li>Diagnosed and resolved connectivity issues across LAN/WAN, VPN access, wireless networks and internet outages</li>
+            <li>Managed and tracked customer incidents through ticketing systems with timely resolution and escalation handling</li>
+            <li>Collaborated with network engineers to resolve service disruptions and improve incident response efficiency</li>
+            <li>Monitored recurring customer complaints and escalated systemic faults for preventive remediation</li>
+            <li>Delivered customer education on network usage, router security and troubleshooting best practices</li>
+          </ul>
+          <div class="tl-tech"><span>LAN/WAN</span><span>FTTH</span><span>Wireless</span><span>VPN</span><span>Router config</span><span>Ticketing</span><span>ISP ops</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-head"><div class="tl-role">IT Support Technician</div><div class="tl-period">Aug 2023 — Jan 2024</div></div>
+          <div class="tl-co">Kenya Pipeline Company Limited · Nairobi, KE</div>
+          <ul class="tl-bul">
+            <li>Provided end-user technical support for hardware, software, printers and network connectivity across enterprise environments</li>
+            <li>Assisted in setup, maintenance and troubleshooting of LAN infrastructure and workstation connectivity</li>
+            <li>Performed data backup, recovery, cloning and system maintenance to ensure operational continuity</li>
+            <li>Supported remote users through helpdesk and remote troubleshooting tools</li>
+            <li>Maintained ICT asset inventory records, technical documentation and knowledge base articles</li>
+            <li>Assisted with Active Directory user support and system access troubleshooting</li>
+          </ul>
+          <div class="tl-tech"><span>LAN support</span><span>Hardware</span><span>Active Directory</span><span>Remote support</span><span>Windows</span><span>Docs</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-head"><div class="tl-role">Diploma in Information Technology</div><div class="tl-period">Completed Nov 2023</div></div>
+          <div class="tl-co">KCA University · Nairobi, KE</div>
+          <ul class="tl-bul">
+            <li>Foundations in networking, programming, systems administration, and database design</li>
+            <li>Hands-on coursework in Cisco networking, Linux administration, and software development</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="certs">
+  <div class="container reveal">
+    <div class="s-label">06 · Credentials</div>
+    <h2 class="s-title">Certifications & <span class="grad">credentials</span></h2>
+    <p class="s-sub">Earned credentials and ongoing certifications across software engineering, networking, security, and data.</p>
+    <div class="cert-grid">
+      <div class="cert" style="--c:var(--primary)"><div class="cert-ico">💻</div><div class="cert-name">Software Engineering</div><div class="cert-issuer">ALX Africa · 2024</div><div class="cert-tag">VERIFIED</div></div>
+      <div class="cert" style="--c:var(--secondary)"><div class="cert-ico">🛡️</div><div class="cert-name">CCNA</div><div class="cert-issuer">Cisco · Network Associate</div><div class="cert-tag wip">IN PROGRESS</div></div>
+      <div class="cert" style="--c:var(--accent)"><div class="cert-ico">🔒</div><div class="cert-name">CompTIA Security+</div><div class="cert-issuer">CompTIA · Security Cert</div><div class="cert-tag wip">IN PROGRESS</div></div>
+      <div class="cert" style="--c:var(--success)"><div class="cert-ico">📊</div><div class="cert-name">Google Data Analytics</div><div class="cert-issuer">Coursera · Professional</div><div class="cert-tag">VERIFIED</div></div>
+      <div class="cert" style="--c:var(--warn)"><div class="cert-ico">🧠</div><div class="cert-name">Data Science Associate</div><div class="cert-issuer">EMCDSA · NRF Kenya</div><div class="cert-tag">VERIFIED</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="container reveal">
+    <div class="s-label">07 · Connect</div>
+    <h2 class="s-title">Let's build something <span class="grad">resilient</span></h2>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Open channel.</h3>
+        <p>Looking for a NOC engineer, technical support specialist, or someone who can both troubleshoot the wire and ship the code? Let's talk. I respond fast — usually within a few hours during business time, even on shift.</p>
+        <div class="contact-links">
+          <a href="mailto:mogenibillmecha@email.com" class="c-link"><div class="ico">@</div><div><span class="lbl">Email</span><span class="val">mogenibillmecha@email.com</span></div></a>
+          <a href="https://linkedin.com/in/billmecha" class="c-link"><div class="ico">in</div><div><span class="lbl">LinkedIn</span><span class="val">linkedin.com/in/billmecha</span></div></a>
+          <a href="https://github.com/cox101" class="c-link"><div class="ico">⌥</div><div><span class="lbl">GitHub</span><span class="val">github.com/cox101</span></div></a>
+          <a href="#" class="c-link"><div class="ico">⌘</div><div><span class="lbl">Location</span><span class="val">Nairobi, Kenya · UTC+3 · 24/7 capable</span></div></a>
+        </div>
+      </div>
+      <div class="form">
+        <div class="fg"><label>Identifier</label><input type="text" placeholder="Your name"></div>
+        <div class="fg"><label>Return address</label><input type="email" placeholder="you@example.com"></div>
+        <div class="fg"><label>Subject</label><input type="text" placeholder="Role · Project · Collaboration"></div>
+        <div class="fg"><label>Payload</label><textarea placeholder="Tell me about your team, opportunity, or technical challenge..."></textarea></div>
+        <button class="send-btn" onclick="sendMsg(this)">▶ Transmit secure message</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>⚙️ Engineered with <span class="heart">precision</span> by <span>Bill Mecha</span> · Network Operations & Software · © 2026</p>
+  <p style="margin-top:.4rem;opacity:.5">Press <kbd style="background:rgba(139,92,246,.1);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-size:.7rem">~</kbd> or click ▣ Terminal · Try <code style="color:var(--secondary)">sudo clearance</code></p>
+</footer>
+
+<div id="terminal">
+  <div class="term-bar">
+    <div class="term-dots"><span></span><span></span><span></span></div>
+    <div class="term-title">portfolio-shell</div>
+    <button class="term-close" type="button" onclick="toggleTerm()">×</button>
+  </div>
+  <div class="term-body" id="termBody">
+    <div class="term-line out">type <span style="color:var(--secondary)">help</span> for available commands</div>
+    <div class="term-input-row">
+      <span class="term-prompt">~</span>
+      <input id="termIn" type="text" autocomplete="off" spellcheck="false" placeholder="command...">
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+const bootLines = document.querySelectorAll('.boot-line');
+bootLines.forEach((line, i) => setTimeout(() => line.classList.add('show'), 250 + i * 320));
+setTimeout(() => {
+  document.getElementById('boot').classList.add('done');
+  startTyping(); startTraffic(); startGlobe(); startLogs(); startStats();
+}, 3200);
+
+const glow = document.getElementById('cursorGlow');
+let glowX = innerWidth/2, glowY = innerHeight/2;
+let mx = glowX, my = glowY;
+addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function follow() {
+  glowX += (mx - glowX) * 0.12;
+  glowY += (my - glowY) * 0.12;
+  glow.style.left = glowX + 'px';
+  glow.style.top = glowY + 'px';
+  requestAnimationFrame(follow);
+})();
+
+const bg = document.getElementById('bg');
+const bctx = bg.getContext('2d');
+let W, H, nodes = [];
+const N = 60;
+function bgResize() { W = bg.width = innerWidth; H = bg.height = innerHeight; }
+bgResize(); addEventListener('resize', bgResize);
+for (let i = 0; i < N; i++) nodes.push({
+  x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+  vx: (Math.random() - .5) * 0.3, vy: (Math.random() - .5) * 0.3,
+  r: Math.random() * 1.5 + 0.5,
+  c: Math.random() < .5 ? '139,92,246' : '6,182,212'
+});
+function bgDraw() {
+  bctx.clearRect(0, 0, W, H);
+  nodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+    bctx.beginPath(); bctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    bctx.fillStyle = `rgba(${n.c},.6)`; bctx.fill();
+  });
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 130) {
+        bctx.beginPath(); bctx.moveTo(nodes[i].x, nodes[i].y); bctx.lineTo(nodes[j].x, nodes[j].y);
+        bctx.strokeStyle = `rgba(139,92,246,${.15 * (1 - d / 130)})`; bctx.lineWidth = .5; bctx.stroke();
+      }
+    }
+    const dx = nodes[i].x - mx, dy = nodes[i].y - my;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    if (d < 180) {
+      bctx.beginPath(); bctx.moveTo(nodes[i].x, nodes[i].y); bctx.lineTo(mx, my);
+      bctx.strokeStyle = `rgba(6,182,212,${.3 * (1 - d / 180)})`; bctx.lineWidth = .7; bctx.stroke();
+    }
+  }
+  requestAnimationFrame(bgDraw);
+}
+bgDraw();
+
+const phrases = [
+  'init noc_engineer.sh',
+  'monitor isp_network.service',
+  'troubleshoot ftth_link.py',
+  'escalate incident.ticket',
+  'analyze pcap --filter vpn',
+  'compile security_plus.study'
+];
+let pi = 0, ci = 0, del = false;
+function startTyping() {
+  const el = document.getElementById('typed');
+  function step() {
+    const p = phrases[pi];
+    if (!del) {
+      el.textContent = p.slice(0, ++ci);
+      if (ci === p.length) { del = true; setTimeout(step, 1600); return; }
+    } else {
+      el.textContent = p.slice(0, --ci);
+      if (ci === 0) { del = false; pi = (pi + 1) % phrases.length; }
+    }
+    setTimeout(step, del ? 30 : 60);
+  }
+  step();
+}
+
+const sp = document.getElementById('scrollProgress');
+addEventListener('scroll', () => {
+  const t = (scrollY / (document.body.scrollHeight - innerHeight)) * 100;
+  sp.style.width = t + '%';
+});
+
+const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), { threshold: .12 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+const skillData = [
+  { id: 'core', x: 400, y: 225, r: 32, c: '#EC4899', name: 'NOC & Support', desc: 'L1/L2 ISP & enterprise support engineering', t: 'core' },
+  { id: 'net', x: 200, y: 100, r: 24, c: '#06B6D4', name: 'Networking', desc: 'TCP/IP, Routing, Switching, VLANs, DNS, DHCP', t: 'domain' },
+  { id: 'isp', x: 200, y: 350, r: 24, c: '#8B5CF6', name: 'ISP Infra', desc: 'FTTH, GPON, OLT, Fiber, CPE provisioning', t: 'domain' },
+  { id: 'sec', x: 600, y: 100, r: 24, c: '#F59E0B', name: 'Security', desc: 'Firewalls, VPN, NAC, Wireshark, Sec+ in progress', t: 'domain' },
+  { id: 'sw', x: 600, y: 350, r: 24, c: '#10B981', name: 'Software Eng', desc: 'Python, JS, Linux — ALX certified', t: 'domain' },
+  { id: 'tcp', x: 100, y: 60, r: 13, c: '#06B6D4', name: 'TCP/IP', desc: 'Stack, troubleshooting, packet flow', t: 'skill' },
+  { id: 'rt', x: 80, y: 160, r: 13, c: '#06B6D4', name: 'Routing', desc: 'Static, dynamic, troubleshooting paths', t: 'skill' },
+  { id: 'ftth', x: 80, y: 280, r: 13, c: '#8B5CF6', name: 'FTTH/GPON', desc: 'Fiber optic ISP delivery, OLT/ONT', t: 'skill' },
+  { id: 'voip', x: 100, y: 400, r: 13, c: '#8B5CF6', name: 'VoIP', desc: 'Voice over IP support and troubleshooting', t: 'skill' },
+  { id: 'fw', x: 720, y: 60, r: 13, c: '#F59E0B', name: 'Firewalls', desc: 'Policy fundamentals, NAT, ACLs', t: 'skill' },
+  { id: 'vpn', x: 700, y: 160, r: 13, c: '#F59E0B', name: 'VPN', desc: 'IPSec, SSL, remote-access troubleshooting', t: 'skill' },
+  { id: 'py', x: 700, y: 280, r: 13, c: '#10B981', name: 'Python', desc: 'Scripting, automation, ALX coursework', t: 'skill' },
+  { id: 'lin', x: 720, y: 400, r: 13, c: '#10B981', name: 'Linux', desc: 'Server admin, services, CLI fluency', t: 'skill' }
+];
+const skillEdges = [
+  ['core', 'net'], ['core', 'isp'], ['core', 'sec'], ['core', 'sw'],
+  ['net', 'tcp'], ['net', 'rt'], ['isp', 'ftth'], ['isp', 'voip'],
+  ['sec', 'fw'], ['sec', 'vpn'], ['sw', 'py'], ['sw', 'lin'],
+  ['net', 'isp'], ['sec', 'net'], ['sw', 'sec']
+];
+const sSvg = document.getElementById('skillSvg');
+const sTip = document.getElementById('skillTip');
+const nMap = {}; skillData.forEach(n => nMap[n.id] = n);
+skillEdges.forEach(([a, b]) => {
+  const A = nMap[a], B = nMap[b];
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', A.x); line.setAttribute('y1', A.y);
+  line.setAttribute('x2', B.x); line.setAttribute('y2', B.y);
+  line.setAttribute('stroke', 'rgba(139,92,246,.2)');
+  line.setAttribute('stroke-width', '1');
+  line.setAttribute('stroke-dasharray', '3,3');
+  sSvg.appendChild(line);
+});
+skillData.forEach(n => {
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('transform', `translate(${n.x},${n.y})`);
+  g.style.cursor = 'pointer';
+  const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  pulse.setAttribute('r', n.r + 6); pulse.setAttribute('fill', n.c); pulse.setAttribute('opacity', '0.08');
+  const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  c.setAttribute('r', n.r); c.setAttribute('fill', n.c); c.setAttribute('opacity', '0.18');
+  c.setAttribute('stroke', n.c); c.setAttribute('stroke-width', '1.5');
+  const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  t.setAttribute('y', n.r + 14); t.setAttribute('text-anchor', 'middle');
+  t.setAttribute('fill', '#E2E8F0'); t.setAttribute('font-size', n.t === 'core' ? '13' : '11');
+  t.setAttribute('font-family', 'Inter, sans-serif'); t.setAttribute('font-weight', n.t === 'core' ? '600' : '500');
+  t.textContent = n.name;
+  g.appendChild(pulse); g.appendChild(c); g.appendChild(t);
+  g.addEventListener('mouseenter', () => {
+    c.setAttribute('opacity', '0.35'); pulse.setAttribute('opacity', '0.2');
+    sTip.innerHTML = `<div class="tt">${n.t}</div><div class="tn">${n.name}</div><div class="td">${n.desc}</div>`;
+    sTip.style.opacity = '1';
+  });
+  g.addEventListener('mousemove', e => {
+    const r = sSvg.getBoundingClientRect();
+    sTip.style.left = (e.clientX - r.left + 12) + 'px';
+    sTip.style.top = (e.clientY - r.top + 12) + 'px';
+  });
+  g.addEventListener('mouseleave', () => {
+    c.setAttribute('opacity', '0.18'); pulse.setAttribute('opacity', '0.08');
+    sTip.style.opacity = '0';
+  });
+  sSvg.appendChild(g);
+  const anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+  anim.setAttribute('attributeName', 'r'); anim.setAttribute('values', `${n.r + 6};${n.r + 12};${n.r + 6}`);
+  anim.setAttribute('dur', (2 + Math.random()).toFixed(1) + 's'); anim.setAttribute('repeatCount', 'indefinite');
+  pulse.appendChild(anim);
+});
+
+let trafficData = Array(60).fill(0).map(() => 30 + Math.random() * 40);
+function startTraffic() {
+  const c = document.getElementById('trafficChart');
+  const ctx = c.getContext('2d');
+  function resize() { c.width = c.clientWidth * 2; c.height = c.clientHeight * 2; ctx.scale(2, 2); }
+  resize();
+  function draw() {
+    trafficData.shift();
+    trafficData.push(20 + Math.random() * 60 + (Math.random() < .07 ? 30 : 0));
+    const w = c.clientWidth, h = c.clientHeight;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = 'rgba(139,92,246,.08)'; ctx.lineWidth = .5;
+    for (let i = 0; i <= 4; i++) {
+      ctx.beginPath(); ctx.moveTo(0, h * i / 4); ctx.lineTo(w, h * i / 4); ctx.stroke();
+    }
+    const step = w / (trafficData.length - 1);
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    trafficData.forEach((v, i) => ctx.lineTo(i * step, h - (v / 100) * h * 0.9));
+    ctx.lineTo(w, h); ctx.closePath();
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(6,182,212,.4)'); grad.addColorStop(1, 'rgba(6,182,212,0)');
+    ctx.fillStyle = grad; ctx.fill();
+    ctx.beginPath();
+    trafficData.forEach((v, i) => i === 0 ? ctx.moveTo(0, h - (v / 100) * h * 0.9) : ctx.lineTo(i * step, h - (v / 100) * h * 0.9));
+    ctx.strokeStyle = '#06B6D4'; ctx.lineWidth = 1.5; ctx.stroke();
+    const lastY = h - (trafficData[trafficData.length - 1] / 100) * h * 0.9;
+    ctx.beginPath(); ctx.arc(w, lastY, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#EC4899'; ctx.fill();
+    ctx.beginPath(); ctx.arc(w, lastY, 7, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(236,72,153,.4)'; ctx.lineWidth = 1; ctx.stroke();
+  }
+  draw();
+  setInterval(draw, 350);
+  addEventListener('resize', () => { resize(); draw(); });
+}
+
+function startGlobe() {
+  const svg = document.getElementById('globeSvg');
+  const cx = 100, cy = 100, R = 75;
+  for (let i = 1; i <= 3; i++) {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    e.setAttribute('cx', cx); e.setAttribute('cy', cy);
+    e.setAttribute('rx', R); e.setAttribute('ry', R * (i / 4));
+    e.setAttribute('fill', 'none'); e.setAttribute('stroke', 'rgba(139,92,246,.2)'); e.setAttribute('stroke-width', '.5');
+    svg.appendChild(e);
+  }
+  for (let i = 0; i < 4; i++) {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    e.setAttribute('cx', cx); e.setAttribute('cy', cy);
+    e.setAttribute('rx', Math.abs(R * Math.cos(i * Math.PI / 4))); e.setAttribute('ry', R);
+    e.setAttribute('fill', 'none'); e.setAttribute('stroke', 'rgba(6,182,212,.15)'); e.setAttribute('stroke-width', '.5');
+    svg.appendChild(e);
+  }
+  const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  outer.setAttribute('cx', cx); outer.setAttribute('cy', cy); outer.setAttribute('r', R);
+  outer.setAttribute('fill', 'none'); outer.setAttribute('stroke', 'rgba(139,92,246,.3)'); outer.setAttribute('stroke-width', '1');
+  svg.appendChild(outer);
+  const nds = [];
+  for (let i = 0; i < 14; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = R * (0.4 + Math.random() * 0.55);
+    const x = cx + Math.cos(a) * r;
+    const y = cy + Math.sin(a) * r * 0.7;
+    const cir = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    cir.setAttribute('cx', x); cir.setAttribute('cy', y); cir.setAttribute('r', 2);
+    cir.setAttribute('fill', i % 3 === 0 ? '#EC4899' : '#06B6D4');
+    svg.appendChild(cir);
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    p.setAttribute('cx', x); p.setAttribute('cy', y); p.setAttribute('r', 2);
+    p.setAttribute('fill', 'none'); p.setAttribute('stroke', i % 3 === 0 ? '#EC4899' : '#06B6D4'); p.setAttribute('stroke-width', '.5');
+    const an = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+    an.setAttribute('attributeName', 'r'); an.setAttribute('values', '2;8;2');
+    an.setAttribute('dur', (1.8 + Math.random()).toFixed(1) + 's'); an.setAttribute('repeatCount', 'indefinite');
+    const an2 = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+    an2.setAttribute('attributeName', 'opacity'); an2.setAttribute('values', '1;0');
+    an2.setAttribute('dur', (1.8 + Math.random()).toFixed(1) + 's'); an2.setAttribute('repeatCount', 'indefinite');
+    p.appendChild(an); p.appendChild(an2); svg.appendChild(p);
+    nds.push({ x, y });
+  }
+  function drawArc() {
+    const a = nds[Math.floor(Math.random() * nds.length)];
+    const b = nds[Math.floor(Math.random() * nds.length)];
+    if (a === b) return;
+    const mxa = (a.x + b.x) / 2, mya = (a.y + b.y) / 2 - 30;
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', `M ${a.x} ${a.y} Q ${mxa} ${mya} ${b.x} ${b.y}`);
+    p.setAttribute('fill', 'none'); p.setAttribute('stroke', '#06B6D4'); p.setAttribute('stroke-width', '1');
+    p.setAttribute('stroke-dasharray', '4,3'); p.setAttribute('opacity', '0');
+    svg.appendChild(p);
+    let op = 0, t = 0;
+    const id = setInterval(() => {
+      t++;
+      op = t < 10 ? t / 10 : Math.max(0, 1 - (t - 10) / 15);
+      p.setAttribute('opacity', op);
+      p.setAttribute('stroke-dashoffset', t * 2);
+      if (t > 25) { clearInterval(id); p.remove(); }
+    }, 50);
+  }
+  setInterval(drawArc, 800);
+}
+
+function startStats() {
+  const u = document.getElementById('uptime');
+  const v = document.getElementById('vpn');
+  const t = document.getElementById('threats');
+  const l = document.getElementById('latency');
+  let vpn = 847, tickets = 14, latency = 14;
+  setInterval(() => {
+    vpn += Math.floor(Math.random() * 6) - 2;
+    tickets = Math.max(8, tickets + (Math.random() < .5 ? 1 : -1));
+    latency = 12 + Math.floor(Math.random() * 8);
+    v.textContent = vpn.toLocaleString();
+    t.textContent = tickets;
+    l.innerHTML = latency + '<span class="u">ms</span>';
+    const up = (99.95 + Math.random() * 0.04).toFixed(2);
+    u.innerHTML = up + '<span class="u">%</span>';
+  }, 1800);
+}
+
+const logEvents = [
+  ['INFO', 'VPN tunnel established from 192.168.4.18'],
+  ['OK', 'FTTH link UP · ONT serial VSOL58A2B91'],
+  ['WARN', 'High latency detected on Mombasa backhaul'],
+  ['INFO', 'CPE rebooted · MAC a4:5e:60:88:1c:42'],
+  ['CRIT', 'GPON port LoS alarm · OLT slot 3 pon 7'],
+  ['OK', 'Ticket #INC-4892 resolved · SLA met'],
+  ['INFO', 'New subscriber provisioned · service activated'],
+  ['WARN', 'Signal drop on fiber link · auto-recovered'],
+  ['OK', 'Config backup completed · 24 devices'],
+  ['INFO', 'OSPF adjacency formed with rtr-edge-02'],
+  ['CRIT', 'Customer connectivity loss · escalation L2'],
+  ['OK', 'Firmware update applied · 12 routers'],
+  ['INFO', 'Wireshark capture started · vlan-100'],
+  ['WARN', 'Recurring fault detected · RCA opened']
+];
+function startLogs() {
+  const list = document.getElementById('logList');
+  function add() {
+    const [lvl, msg] = logEvents[Math.floor(Math.random() * logEvents.length)];
+    const time = new Date().toTimeString().slice(0, 8);
+    const div = document.createElement('div');
+    div.className = 'log-line';
+    div.innerHTML = `<span class="t">${time}</span><span class="lvl ${lvl.toLowerCase()}">${lvl}</span><span class="msg">${msg}</span>`;
+    list.insertBefore(div, list.firstChild);
+    if (list.children.length > 25) list.removeChild(list.lastChild);
+  }
+  for (let i = 0; i < 8; i++) add();
+  setInterval(add, 1400);
+}
+
+document.querySelectorAll('.tilt').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    card.style.transform = `perspective(1000px) rotateY(${(px - .5) * 6}deg) rotateX(${(.5 - py) * 6}deg) translateY(-4px)`;
+    card.style.setProperty('--x', (px * 100) + '%');
+    card.style.setProperty('--y', (py * 100) + '%');
+  });
+  card.addEventListener('mouseleave', () => card.style.transform = '');
+});
+
+const term = document.getElementById('terminal');
+const termBody = document.getElementById('termBody');
+const termIn = document.getElementById('termIn');
+function toggleTerm() {
+  term.classList.toggle('open');
+  if (term.classList.contains('open')) setTimeout(() => termIn.focus(), 350);
+}
+addEventListener('keydown', e => {
+  if (e.key === '`' || e.key === '~') {
+    if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault(); toggleTerm();
+    }
+  }
+  if (e.key === 'Escape' && term.classList.contains('open')) toggleTerm();
+});
+function tPrint(text, cls = 'out') {
+  const div = document.createElement('div');
+  div.className = 'term-line ' + cls;
+  div.innerHTML = text;
+  termBody.insertBefore(div, termBody.lastElementChild);
+  termBody.scrollTop = termBody.scrollHeight;
+}
+const commands = {
+  help() {
+    tPrint('Available commands:', 'cy');
+    tPrint('  <span style="color:var(--accent)">about</span>       — engineer profile', 'out');
+    tPrint('  <span style="color:var(--accent)">skills</span>      — technical capabilities', 'out');
+    tPrint('  <span style="color:var(--accent)">projects</span>    — featured work', 'out');
+    tPrint('  <span style="color:var(--accent)">experience</span>  — career timeline', 'out');
+    tPrint('  <span style="color:var(--accent)">certs</span>       — certifications', 'out');
+    tPrint('  <span style="color:var(--accent)">contact</span>     — get in touch', 'out');
+    tPrint('  <span style="color:var(--accent)">whoami</span>      — current session info', 'out');
+    tPrint('  <span style="color:var(--accent)">scan</span>        — skill network scan', 'out');
+    tPrint('  <span style="color:var(--accent)">ping</span>        — test connection', 'out');
+    tPrint('  <span style="color:var(--accent)">download</span>    — save portfolio.html', 'out');
+    tPrint('  <span style="color:var(--accent)">clear</span>       — clear terminal', 'out');
+    tPrint('  <span style="color:var(--accent)">sudo clearance</span> — request elevated access', 'out');
+  },
+  about() {
+    tPrint('Technical Support Engineer · Network Operations · ALX SWE', 'cy');
+    tPrint('2+ years supporting ISP & enterprise environments · Nairobi, KE', 'out');
+    tPrint('Currently at Vilcom Networks · 24/7 NOC capable', 'out');
+    setTimeout(() => location.hash = '#about', 400);
+  },
+  skills() {
+    tPrint('Loading skill matrix...', 'out');
+    setTimeout(() => { tPrint('→ NOC · Networking · ISP Infra · Security · Software · Tools', 'cy'); location.hash = '#skills'; }, 500);
+  },
+  projects() {
+    tPrint('6 projects available · personal · lab · deployed', 'cy');
+    setTimeout(() => location.hash = '#projects', 400);
+  },
+  experience() {
+    tPrint('3 roles · 2023 → present · Vilcom · Vijiji · Kenya Pipeline', 'cy');
+    setTimeout(() => location.hash = '#experience', 400);
+  },
+  certs() {
+    tPrint('ALX SWE ✓ · CCNA (in progress) · Sec+ (in progress) · Google DA ✓ · EMCDSA ✓', 'ok');
+    setTimeout(() => location.hash = '#certs', 400);
+  },
+  contact() {
+    tPrint('Opening secure channel...', 'cy');
+    setTimeout(() => location.hash = '#contact', 400);
+  },
+  whoami() {
+    tPrint(`visitor@portfolio · session ${Math.random().toString(36).slice(2, 8)} · ${new Date().toISOString()}`, 'cy');
+    tPrint('Access level: STANDARD', 'out');
+  },
+  scan() {
+    tPrint('Scanning skill network...', 'out');
+    const steps = ['→ NOC & Support ............... FOUND', '→ Networking (TCP/IP, routing) FOUND', '→ ISP Infra (FTTH/GPON) ....... FOUND', '→ Security fundamentals ....... FOUND', '→ Software Engineering ........ FOUND', '→ 13 sub-capabilities indexed . OK'];
+    steps.forEach((s, i) => setTimeout(() => tPrint(s, 'ok'), 400 + i * 300));
+  },
+  ping() {
+    tPrint('PING portfolio.sys (127.0.0.1) 56 bytes', 'out');
+    [12, 14, 11, 13].forEach((t, i) => setTimeout(() => tPrint(`64 bytes from portfolio.sys: icmp_seq=${i + 1} time=${t}ms`, 'ok'), 200 + i * 250));
+    setTimeout(() => tPrint('--- 4 packets transmitted · 0% loss · avg 12.5ms ---', 'cy'), 1300);
+  },
+  clear() {
+    termBody.querySelectorAll('.term-line').forEach(l => l.remove());
+  },
+  download() {
+    tPrint('Packaging portfolio.html...', 'out');
+    setTimeout(() => { tPrint('✓ Download initiated', 'ok'); downloadSite(); }, 600);
+  },
+  'sudo clearance'() {
+    tPrint('[ AUTH ] Requesting elevated access...', 'out');
+    setTimeout(() => tPrint('[ AUTH ] Biometric verified', 'ok'), 500);
+    setTimeout(() => tPrint('[ AUTH ] ✓ CLEARANCE GRANTED · LEVEL 5', 'acc'), 1100);
+    setTimeout(() => {
+      tPrint('Welcome to the inner circle. You found the easter egg. 🎉', 'acc');
+      tPrint('→ Hire me: <span style="color:var(--secondary)">you@email.com</span>', 'out');
+      tPrint('→ Hidden fact: I run a home lab with pfSense, VLANs and Pi-hole.', 'out');
+      tPrint('→ Currently grinding CCNA and Security+ labs every weekend.', 'out');
+      document.body.style.animation = 'gradShift 0.6s';
+    }, 1700);
+  }
+};
+termIn.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const cmd = termIn.value.trim();
+    if (!cmd) return;
+    tPrint(cmd, 'cmd');
+    termIn.value = '';
+    if (commands[cmd]) commands[cmd]();
+    else if (cmd === 'ls') tPrint('about  skills  projects  experience  certs  contact  README.md', 'out');
+    else if (cmd === 'exit' || cmd === 'quit') toggleTerm();
+    else tPrint(`command not found: ${cmd} · type 'help'`, 'err');
+  }
+});
+
+function downloadSite() {
+  const html = '<!DOCTYPE html>\n<html lang="en">\n' + document.documentElement.innerHTML + '\n</html>';
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'portfolio.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const toast = document.createElement('div');
+  toast.textContent = '✓ portfolio.html downloaded';
+  toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--success),var(--secondary));color:#fff;padding:.75rem 1.5rem;border-radius:.5rem;font-family:var(--mono);font-size:.85rem;z-index:1000;box-shadow:0 10px 40px -10px rgba(16,185,129,.5)';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+function sendMsg(btn) {
+  const orig = btn.innerHTML;
+  btn.innerHTML = '⌛ Transmitting...';
+  btn.style.background = 'var(--muted)';
+  setTimeout(() => {
+    btn.innerHTML = '✓ Message transmitted · check your DMs';
+    btn.style.background = 'linear-gradient(135deg,var(--success),var(--secondary))';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 3500);
+  }, 1200);
+}
+
+// ============== EDIT MODE ==============
+//const EDITABLE_SEL = '.hero-name, .hero-role, .hero-desc, .s-title, .s-sub, .about-text p, .about-text h3, .info-row .v, .strength, .tl-role, .tl-co, .tl-period, .tl-bul li, .proj-name, .proj-desc, .cert-name, .cert-issuer, .c-link .val, .stat-num, .stat-label, .skill-cat .ct, .skill-cat .cl span, .proj-stack span, .tl-tech span, .hero-tag, .proj-status, .cert-tag, footer p';
+//let editing = false;
+//const editBanner = document.createElement('div');
+//editBanner.className = 'edit-banner';
+//editBanner.innerHTML = '<span>✎ EDIT MODE</span><span class="hint">Click any text to edit · Ctrl+E to toggle</span><button onclick="saveEdited()">💾 Save & Download</button><button onclick="toggleEdit()">✕ Exit</button>';
+//document.body.appendChild(editBanner);
+//
+
+function showToast(msg, type) {
+  const toast = document.createElement('div');
+  toast.textContent = msg;
+  const bg = type === 'edit' ? 'linear-gradient(135deg,var(--accent),var(--warn))' : 'linear-gradient(135deg,var(--success),var(--secondary))';
+  toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:' + bg + ';color:#fff;padding:.75rem 1.5rem;border-radius:.5rem;font-family:var(--mono);font-size:.85rem;z-index:2000;box-shadow:0 10px 40px -10px rgba(0,0,0,.5)';
+  toast.dataset.toast = '1';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function toggleEdit() {
+  editing = !editing;
+  document.body.classList.toggle('editing', editing);
+  editBanner.classList.toggle('show', editing);
+  document.querySelectorAll(EDITABLE_SEL).forEach(el => {
+    if (editing) el.setAttribute('contenteditable', 'true');
+    else el.removeAttribute('contenteditable');
+  });
+  const btn = document.getElementById('editBtn');
+  if (btn) btn.innerHTML = editing ? '✕ Exit Edit' : '✎ Edit';
+  if (editing) showToast('Edit mode on · click any text to edit', 'edit');
+}
+
+// Sync href when editing link text
+document.addEventListener('blur', e => {
+  if (!editing) return;
+  const el = e.target;
+  if (!el.getAttribute || el.getAttribute('contenteditable') !== 'true') return;
+  const a = el.closest('a');
+  if (!a) return;
+  const text = el.textContent.trim();
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) a.href = 'mailto:' + text;
+  else if (/^https?:\/\//.test(text)) a.href = text;
+  else if (/^(www\.)?[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(text)) a.href = 'https://' + text.replace(/^www\./, '');
+}, true);
+
+// Prevent link navigation while editing
+document.addEventListener('click', e => {
+  if (!editing) return;
+  const a = e.target.closest('a');
+  if (a) e.preventDefault();
+}, true);
+
+// Keyboard shortcut Ctrl/Cmd + E
+addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'e') {
+    e.preventDefault();
+    toggleEdit();
+  }
+});
+
+function saveEdited() {
+  const wasEditing = editing;
+  // Strip contenteditable from live DOM temporarily
+  document.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+  document.body.classList.remove('editing');
+  editBanner.classList.remove('show');
+
+  const clone = document.documentElement.cloneNode(true);
+
+  // Clean JS-injected dynamic content (rebuilds on load)
+  ['#logList', '#globeSvg', '#skillSvg'].forEach(sel => {
+    const el = clone.querySelector(sel);
+    if (el) el.innerHTML = '';
+  });
+  const tip = clone.querySelector('#skillTip');
+  if (tip) { tip.innerHTML = ''; tip.removeAttribute('style'); }
+
+  // Strip any leftover contenteditable
+  clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+
+  // Reset state classes
+  const bodyEl = clone.querySelector('body');
+  if (bodyEl) bodyEl.classList.remove('editing');
+  const banner = clone.querySelector('.edit-banner');
+  if (banner) banner.remove();
+  const term = clone.querySelector('#terminal');
+  if (term) term.classList.remove('open');
+
+  // Reset terminal scrollback (keep only welcome + input row)
+  const termBody = clone.querySelector('#termBody');
+  if (termBody) {
+    const lines = termBody.querySelectorAll('.term-line');
+    lines.forEach((l, i) => { if (i > 0) l.remove(); });
+  }
+
+  // Reset runtime inline styles
+  clone.querySelectorAll('.proj.tilt').forEach(p => p.removeAttribute('style'));
+  const glowEl = clone.querySelector('#cursorGlow');
+  if (glowEl) glowEl.removeAttribute('style');
+  const sp = clone.querySelector('#scrollProgress');
+  if (sp) sp.style.width = '0%';
+  const bgC = clone.querySelector('#bg');
+  if (bgC) { bgC.removeAttribute('width'); bgC.removeAttribute('height'); }
+  const tc = clone.querySelector('#trafficChart');
+  if (tc) { tc.removeAttribute('width'); tc.removeAttribute('height'); tc.removeAttribute('style'); }
+
+  // Reset boot & reveal so animations replay
+  const boot = clone.querySelector('#boot');
+  if (boot) boot.classList.remove('done');
+  clone.querySelectorAll('.boot-line').forEach(l => l.classList.remove('show'));
+  clone.querySelectorAll('.reveal').forEach(el => el.classList.remove('in'));
+
+  // Remove any toast or temp anchor elements
+  clone.querySelectorAll('[data-toast]').forEach(d => d.remove());
+
+  const html = '<!DOCTYPE html>\n<html lang="en">\n' + clone.innerHTML + '\n</html>';
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'index.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  // Restore edit mode if it was on
+  //if (wasEditing) {
+   // document.body.classList.add('editing');
+    //editBanner.classList.add('show');
+   // document.querySelectorAll(EDITABLE_SEL).forEach(el => el.setAttribute('contenteditable', 'true'));
+ // }
+
+  //showToast('✓ index.html downloaded · Replace it in your GitHub repo to deploy');
+}
+
+// Hook into terminal commands
+if (typeof commands === 'object') {
+  commands.edit = function() {
+    tPrint('Toggling edit mode...', 'cy');
+    setTimeout(toggleEdit, 300);
+  };
+  commands.save = function() {
+    tPrint('Saving edited HTML...', 'out');
+    setTimeout(() => { tPrint('✓ Download initiated', 'ok'); saveEdited(); }, 300);
+  };
+}
+</script>
+</body>
+</html>
